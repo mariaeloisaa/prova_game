@@ -20,7 +20,7 @@ class _LoadingApiPageState extends State<LoadingApiPage> {
     mudarPagina();
   }
 
-  // ----- API -----
+  //consumindo api
   void pegarFrase() async {
     final response = await http.get(
       Uri.parse("https://api.adviceslip.com/advice"),
@@ -34,7 +34,7 @@ class _LoadingApiPageState extends State<LoadingApiPage> {
     }
   }
 
-  // ----- TIMER -----
+  //tempo
   void mudarPagina() async {
     await Future.delayed(const Duration(seconds: 6));
 
@@ -47,7 +47,7 @@ class _LoadingApiPageState extends State<LoadingApiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1565C0), 
+      backgroundColor: const Color(0xFF00ACC1),
       body: Center(
         child: frase == null
             ? const CircularProgressIndicator(color: Colors.white)

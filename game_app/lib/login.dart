@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'loading.dart';
+import '../auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,40 +16,66 @@ class _LoginPageState extends State<LoginPage> {
 
   String error = "";
 
-  String correctUser = "admin";
-  String correctPassword = "123456";
+  //login admin blocado
+  final String adminUser = "admin";
+  final String adminPass = "123456";
 
-  void login() {
-    if (user.text == correctUser && password.text == correctPassword) {
-      setState(() => error = "");
+  Future<void> login() async {
+    final username = user.text.trim();
+    final pass = password.text.trim();
+
+    
+    if (username == adminUser && pass == adminPass) {
+      usuarioLogadoId = null;
+      usuarioLogadoNome = "admin";
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoadingApiPage()),
+        MaterialPageRoute(builder: (_) => LoadingApiPage()),
       );
-    } else {
-      setState(() {
-        error = "Credenciais incorretas";
-      });
+      return;
+    }
+
+    //login tabela jogadores 
+    try {
+      final result = await FirebaseFirestore.instance
+          .collection("jogadores")
+          .where("nome", isEqualTo: username)
+          .where("senha", isEqualTo: pass)
+          .get();
+
+      if (result.docs.isNotEmpty) {
+        usuarioLogadoId = result.docs.first.id;
+        usuarioLogadoNome = username;
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => LoadingApiPage()),
+        );
+      } else {
+        setState(() => error = "Usuário ou senha incorretos");
+      }
+    } catch (e) {
+      setState(() => error = "Erro ao conectar com o banco de dados");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
+    final double w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Color(0xFFE3F2FD), 
+      backgroundColor: const Color(0xFFE0F7FA),
       body: Center(
         child: Container(
           width: w * 0.85,
-          padding: const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: const [
               BoxShadow(
-                blurRadius: 12,
+                blurRadius: 15,
                 spreadRadius: 2,
                 offset: Offset(0, 4),
                 color: Colors.black12,
@@ -57,69 +85,88 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // LOGO
+              
               Container(
-                height: 120,
-                width: 120,
-                child: Image.asset(
-                  "assets/images/logo.png",
-                  fit: BoxFit.contain,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF80DEEA), 
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_pin_circle,
+                  size: 70,
+                  color: Color(0xFF006064),
                 ),
               ),
 
               const SizedBox(height: 25),
 
-              // INPUT USUÁRIO
+              
               TextField(
                 controller: user,
                 decoration: InputDecoration(
                   labelText: "Usuário",
-                  labelStyle: TextStyle(color: Color(0xFF1565C0)),
+                  labelStyle: const TextStyle(color: Color(0xFF00838F)),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF1565C0)),
+                    borderSide: const BorderSide(color: Color(0xFF00ACC1), width: 2),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
 
               const SizedBox(height: 15),
 
-              // INPUT SENHA
+              
               TextField(
                 controller: password,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Senha",
-                  labelStyle: TextStyle(color: Color(0xFF1565C0)),
+                  labelStyle: const TextStyle(color: Color(0xFF00838F)),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF1565C0)),
+                    borderSide: const BorderSide(color: Color(0xFF00ACC1), width: 2),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
-              // BOTÃO LOGIN
+              
               ElevatedButton(
                 onPressed: login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1E88E5),
-                  minimumSize: Size(w * 0.6, 45),
+                  backgroundColor: const Color(0xFF00ACC1),
+                  minimumSize: Size(w * 0.5, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 3,
                 ),
                 child: const Text(
                   "Entrar",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(color: Colors.white, fontSize: 17),
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
-              // ERRO
-              Text(
-                error,
-                style: const TextStyle(color: Colors.red),
-              ),
+              
+              if (error.isNotEmpty)
+                Text(
+                  error,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
             ],
           ),
         ),

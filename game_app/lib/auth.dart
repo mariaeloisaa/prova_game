@@ -1,0 +1,2 @@
+String? usuarioLogadoId;
+String? usuarioLogadoNome;

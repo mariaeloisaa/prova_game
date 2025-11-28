@@ -39,10 +39,10 @@ class _NavBarState extends State<NavBar> {
             icon: Icon(Icons.people),
             label: "Jogadores",
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.leaderboard),
-          //   label: "Ranking",
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: "Ranking",
+          ),
         ],
       ),
     );

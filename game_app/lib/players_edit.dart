@@ -29,10 +29,19 @@ class _EditJogadorPageState extends State<EditJogadorPage> {
   }
 
   Future<void> updateJogador() async {
-    FirebaseFirestore.instance.collection("jogadores").doc(widget.id).set({
+    await FirebaseFirestore.instance.collection("jogadores").doc(widget.id).set({
       "nome": nomeController.text,
       "senha": senhaController.text,
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Jogador atualizado com sucesso!"),
+        backgroundColor: Colors.blue,
+      ),
+    );
+
+    Navigator.pop(context);
   }
 
   @override

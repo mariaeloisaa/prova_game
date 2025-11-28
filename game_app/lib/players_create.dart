@@ -13,11 +13,22 @@ class _AddJogadorPageState extends State<AddJogadorPage> {
   TextEditingController senhaController = TextEditingController();
 
   Future<void> addJogador() async {
-    FirebaseFirestore.instance.collection("jogadores").add({
+    await FirebaseFirestore.instance.collection("jogadores").add({
       "nome": nomeController.text,
       "senha": senhaController.text,
-      "melhorTempo": null, // opcional para ranking
+      "melhorTempo": null,
     });
+
+    // mensagem
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Jogador criado com sucesso!"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // voltar pra lista
+    Navigator.pop(context);
   }
 
   @override
@@ -46,9 +57,7 @@ class _AddJogadorPageState extends State<AddJogadorPage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                addJogador();
-              },
+              onPressed: addJogador,
               child: const Text("Salvar"),
             )
           ],
