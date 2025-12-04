@@ -48,7 +48,7 @@ class Home extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // título "Olá jogador"
+              
               Text(
                 "Olá, ${usuarioLogadoNome ?? "Jogador"}!",
                 style: const TextStyle(
